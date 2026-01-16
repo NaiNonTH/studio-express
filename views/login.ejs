@@ -1,0 +1,22 @@
+<%- contentFor('styleLink') %>
+<link rel="stylesheet" href="/stylesheets/login.css">
+
+<%- contentFor('body') %>
+<div class="box login-card">
+    <h2>เข้าสู่ระบบ</h2>
+    <form method="post" action="/login">
+        <% if (typeof errorMessage != "undefined") { %>
+            <p class="error"><%=errorMessage %></p>
+        <% } %>
+        <div>
+            <label for="email">ที่อยู่อีเมล</label>
+            <input type="email" name="email" id="email" placeholder="Email">
+        </div>
+        <div>
+            <label for="password">รหัสผ่าน</label>
+            <input type="password" name="password" id="password" placeholder="Password">
+        </div>
+        <button>เข้าสู่ระบบ</button>
+    </form>
+    <p class="note">ยังไม่มีบัญชีใช่ไหม? <a href="/register">ลงทะเบียนเลยที่นี่</a></p>
+</div>

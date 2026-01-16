@@ -1,0 +1,56 @@
+.dashboard {
+	display: grid;
+	grid-template-columns: 1fr 18rem;
+	gap: 1rem;
+}
+.dashboard .span {
+	grid-column: span 2;
+	
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.dashboard .span * {
+	margin: 0;
+}
+
+.reservation-list {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+.reservation-list .box {
+	padding: 0;
+
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+}
+.reservation-list .zone {
+	padding: 1.5rem;
+	font-size: 2rem;
+	font-weight: bold;
+
+	background: #fafafa;
+	border-right: 1px solid #e9e9e9;
+}
+.reservation-list .details {
+	padding-left: 1rem;
+}
+
+form button {
+    display: block;
+    margin: 2rem auto 0;
+}
+
+@media (max-width: 62rem) {
+	.dashboard {
+		display: block;
+
+		max-width: 40rem;
+		margin: auto;
+	}
+	.dashboard > * {
+		margin: 1rem 0;
+	}
+}

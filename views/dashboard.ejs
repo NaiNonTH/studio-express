@@ -1,0 +1,51 @@
+<%- contentFor('styleLink') %>
+<link rel="stylesheet" href="/stylesheets/dashboard.css">
+
+<%- contentFor('body') %>
+<div class="dashboard">
+  <div class="box span">
+    <h2>สวัสดี <%=user.name %></h2>
+    <a href="/logout" class="button">ออกจากระบบ</a>
+  </div>
+  <div class="box reservation-list">
+    <div class="box">
+      <div class="zone">
+        A
+      </div>
+      <div class="details">
+        <h3>อา. 18 มกราคม 2569</h3>
+        <p>เวลา 20:00-21:00 น.</p>
+      </div>
+    </div>
+    <div class="box">
+      <div class="zone">
+        A
+      </div>
+      <div class="details">
+        <h3>อา. 18 มกราคม 2569</h3>
+        <p>เวลา 20:00-21:00 น.</p>
+      </div>
+    </div>
+    <div class="box">
+      <div class="zone">
+        A
+      </div>
+      <div class="details">
+        <h3>อา. 18 มกราคม 2569</h3>
+        <p>เวลา 20:00-21:00 น.</p>
+      </div>
+    </div>
+  </div>
+  <form class="box">
+    <h2>รายละเอียดบัญชี</h2>
+    <div>
+      <label for="user_name">ชื่อ-สกุล</label>
+      <input type="text" name="user_name" id="user_name" value="<%=user.name %>">
+    </div>
+    <div>
+      <label for="email">อีเมล</label>
+      <input type="text" name="email" id="email" value="<%=user.email %>">
+    </div>
+    <button>ส่งแก้ไขรายละเอียด</button>
+  </form>
+</div>
