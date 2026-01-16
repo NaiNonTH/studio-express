@@ -67,6 +67,11 @@ button {
     cursor: pointer;
 
     transition: background-color 0.3s;
+
+    display: flex;
+    gap: 1ch;
+    justify-content: center;
+    align-items: center;
 }
 
 a.button:hover,

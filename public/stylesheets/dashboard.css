@@ -38,6 +38,16 @@
 	padding-left: 1rem;
 }
 
+.hero {
+	font-size: 2rem;
+	font-weight: bold;
+	margin: 0 0 1rem !important;
+	padding-top: 1rem;
+}
+.center {
+	text-align: center;
+}
+
 form button {
     display: block;
     margin: 2rem auto 0;
