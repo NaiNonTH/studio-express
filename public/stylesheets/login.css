@@ -20,26 +20,6 @@ body {
     align-self: stretch;
 }
 
-.note {
-    font-size: smaller;
-    color: #808080;
-    text-align: center;
-
-    margin-top: 2rem;
-}
-
-form .note {
-    text-align: right;
-    margin: 0;
-}
-
-.error {
-    color: crimson;
-}
-ul.error {
-    padding-left: 1rem;
-}
-
 @media (max-width: 900px) {
     .login-card {
         flex-direction: column;

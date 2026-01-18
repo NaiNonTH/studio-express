@@ -38,6 +38,7 @@ router.post("/login", checkAuthToSkipLogin, function (req, res, next) {
         req.flash("errorMessage", "ไม่พบผู้ใช้ที่มีอีเมลดังกล่าว");
       else if (bcrypt.compareSync(password, user.password)) // สำเร็จ
         req.session.user = {
+          id: user.user_id,
           name: user.user_name,
           email: user.email,
           role: user.role,

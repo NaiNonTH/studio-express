@@ -41,16 +41,74 @@
       </div>
     </div> -->
   </div>
-  <form class="box">
-    <h2>รายละเอียดบัญชี</h2>
-    <div>
-      <label for="user_name">ชื่อ-สกุล</label>
-      <input type="text" name="user_name" id="user_name" value="<%=user.name %>">
-    </div>
-    <div>
-      <label for="email">อีเมล</label>
-      <input type="text" name="email" id="email" value="<%=user.email %>">
-    </div>
-    <button>ส่งแก้ไขรายละเอียด</button>
-  </form>
+  <div class="account-settings">
+    <form method="post" action="/dashboard/user/edit" class="box">
+      <h2>รายละเอียดบัญชี</h2>
+      <% if (target === "edit-user") { %>
+        <ul class="error">
+          <% for (const errorMessage of errorMessages) { %>
+            <li><%=errorMessage %></li>
+          <% } %>
+        </ul>
+        <% if (updated) { %>
+         <p>อัพเดทข้อมูลสำเร็จ</p>
+        <% } %>
+      <% } %>
+      <div>
+        <label for="user_name">ชื่อ-สกุล</label>
+        <input type="text" name="user_name" id="user_name" value="<%=user.name %>">
+      </div>
+      <div>
+        <label for="email">อีเมล</label>
+        <input type="text" name="email" id="email" value="<%=user.email %>">
+      </div>
+      <button>ส่งแก้ไขรายละเอียด</button>
+    </form>
+    <form method="post" action="/dashboard/user/edit-password" class="box">
+      <h2>รหัสผ่านใหม่</h2>
+      <% if (target === "edit-password") { %>
+        <ul class="error">
+          <% for (const errorMessage of errorMessages) { %>
+            <li><%=errorMessage %></li>
+          <% } %>
+        </ul>
+        <% if (updated) { %>
+         <p>อัพเดทรหัสผ่านสำเร็จ</p>
+        <% } %>
+      <% } %>
+      <div>
+        <label for="current_password">รหัสผ่านปัจจุบัน</label>
+        <input type="password" name="current_password" id="current_password">
+      </div>
+      <div>
+        <label for="new_password">รหัสผ่านใหม่</label>
+        <input type="password" name="new_password" id="new_password">
+        <p class="note">รหัสผ่านต้องยาวตั้งแต่ 8 ตัวอักษรขึ้นไป</p>
+      </div>
+      <div>
+        <label for="confirm_password">กรอกรหัสผ่านใหม่อีกครั้ง</label>
+        <input type="password" name="confirm_password" id="confirm_password">
+      </div>
+      <button>ส่งแก้ไขรายละเอียด</button>
+    </form>
+    <form method="post" action="/dashboard/user/delete" class="box">
+      <h2>ลบบัญชี</h2>
+      <% if (target === "delete") { %>
+        <ul class="error">
+          <% for (const errorMessage of errorMessages) { %>
+            <li><%=errorMessage %></li>
+          <% } %>
+        </ul>
+      <% } %>
+      <div>
+        <label for="user_name">กรอกชื่อ-สกุลของคุณก่อนลบบัญชี</label>
+        <input type="text" name="user_name" id="user_name">
+      </div>
+      <div>
+        <label for="password">กรอกรหัสผ่าน</label>
+        <input type="password" name="password" id="password">
+      </div>
+      <button>ลบบัญชี</button>
+    </form>
+  </div>
 </div>
