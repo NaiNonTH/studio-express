@@ -59,6 +59,11 @@ router.post("/edit-password", function(req, res, next) {
     req.flash("errorMessages", "ข้อมูลกรอกไม่ครบถ้วน");
   }
 
+  if (new_password.length < 8) {
+    errorFlag = true;
+    req.flash("errorMessages", "รหัสผ่านใหม่น้อยกว่า 8 ตัวอักษร");
+  }
+
   if (new_password !== confirm_password) {
     errorFlag = true;
     req.flash("errorMessages", "รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน");
