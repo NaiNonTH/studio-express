@@ -4,6 +4,8 @@ var router = express.Router();
 const { checkAuth } = require("../../middlewares/auth");
 
 const dashboardUser = require("./user");
+const dashboardKeeper = require("./keeper");
+const dashboardReservation = require("./reservation");
 
 router.use(checkAuth);
 
@@ -22,5 +24,7 @@ router.get("/empty", function(req, res) {
 });
 
 router.use("/user", dashboardUser);
+router.use("/keeper", dashboardKeeper);
+router.use("/reservation", dashboardReservation);
 
 module.exports = router;
