@@ -1,0 +1,126 @@
+<%- contentFor('styleLink') %>
+<link rel="stylesheet" href="/stylesheets/keeper.css">
+
+<%- contentFor('body') %>
+<div class="dashboard">
+  <div class="box admin-header">
+    <div>
+        <h2>ระบบจัดการ Studio</h2>
+        <p style="color: #666;">ยินดีต้อนรับผู้ดูแล: <%= user.name %></p>
+    </div>
+    <div style="display:flex; gap: 1rem;">
+        <a href="/dashboard" class="button" style="background-color: #666;">กลับหน้าหลัก</a>
+        <a href="/logout" class="button">ออกจากระบบ</a>
+    </div>
+  </div>
+
+  <div class="box span admin-section">
+    <h3>📊 สถิติการจอง 30 วันย้อนหลัง</h3>
+    <% if (stats.length === 0) { %>
+        <p class="note">ยังไม่มีข้อมูลการใช้งานในช่วง 30 วันที่ผ่านมา</p>
+    <% } else { %>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ชื่อโซน</th>
+                    <th>จำนวนครั้งที่จอง</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% stats.forEach(function(stat) { %>
+                    <tr>
+                        <td><%= stat.zone_name %></td>
+                        <td><%= stat.total_usage %> ครั้ง</td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+  </div>
+
+  <div class="box span admin-section">
+    <h3>📅 ตารางการจองวันนี้ (<%= new Date().toLocaleDateString('th-TH') %>)</h3>
+    <% if (bookings.length === 0) { %>
+        <p class="note">วันนี้ไม่มีคิวการจอง</p>
+    <% } else { %>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>เวลา</th>
+                    <th>โซน</th>
+                    <th>ชื่อผู้จอง</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% bookings.forEach(function(item) { %>
+                    <tr>
+                        <td><%= new Date(item.datetime).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) %></td>
+                        <td><%= item.zone_name %></td>
+                        <td><%= item.user_name %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    <% } %>
+  </div>
+
+  <div class="box span admin-section">
+    <h3>🛠️ จัดการข้อมูลโซน</h3>
+    <p class="note" style="text-align: left; margin-bottom: 1rem;">แก้ไขรายละเอียด หรือปิดปรับปรุงโซน (ไม่สามารถลบถาวรได้)</p>
+    
+    <% zones.forEach(function(zone) { %>
+        <div class="admin-card">
+            <form action="/dashboard/keeper/edit-zone" method="POST" class="edit-form">
+                <input type="hidden" name="zone_id" value="<%= zone.zone_id %>">
+                
+                <div class="form-group" style="flex: 0.5;">
+                    <label>ชื่อโซน</label>
+                    <input type="text" name="zone_name" value="<%= zone.zone_name %>" required>
+                </div>
+
+                <div class="form-group" style="flex: 2;">
+                    <label>รายละเอียด</label>
+                    <input type="text" name="zone_details" value="<%= zone.zone_details %>" required>
+                </div>
+
+                <div class="form-group" style="flex: 0.5; min-width: auto;">
+                    <label>สถานะ</label>
+                    <label class="toggle-group">
+                        <input type="checkbox" name="is_open" <%= zone.is_open ? 'checked' : '' %>>
+                        เปิดใช้งาน
+                    </label>
+                </div>
+
+                <button type="submit">บันทึก</button>
+            </form>
+        </div>
+    <% }); %>
+  </div>
+
+  <div class="box span admin-section">
+    <h3>➕ เพิ่มโซนใหม่</h3>
+    <div class="admin-card" style="background: #fafafa;">
+        <form action="/dashboard/keeper/add-zone" method="POST" class="edit-form">
+            <div class="form-group" style="flex: 0.5;">
+                <label>ชื่อโซน</label>
+                <input type="text" name="zone_name" placeholder="เช่น Studio A" required>
+            </div>
+
+            <div class="form-group" style="flex: 2;">
+                <label>รายละเอียด</label>
+                <input type="text" name="zone_details" placeholder="รายละเอียดอุปกรณ์ หรือขนาดห้อง" required>
+            </div>
+
+            <div class="form-group" style="flex: 0.5; min-width: auto;">
+                <label>สถานะเริ่มต้น</label>
+                <label class="toggle-group">
+                    <input type="checkbox" name="is_open" checked>
+                    เปิดใช้งาน
+                </label>
+            </div>
+
+            <button type="submit">เพิ่มโซน</button>
+        </form>
+    </div>
+  </div>
+</div>

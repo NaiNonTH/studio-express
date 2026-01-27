@@ -1,0 +1,103 @@
+/* --- ส่วนที่เพิ่มเข้ามาใหม่เพื่อทดแทน dashboard.css --- */
+
+/* ระยะห่างระหว่างกล่อง */
+.dashboard > * {
+    margin: 1rem 0;
+}
+
+/* จัด Layout ส่วนหัว (Header) ให้ชิดซ้าย-ขวา */
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ลบ margin ของ element ภายใน header เพื่อให้สวยงาม */
+.admin-header * {
+    margin: 0;
+}
+
+/* --- ส่วนเดิมของ Admin (ปรับปรุงเล็กน้อย) --- */
+
+.admin-section {
+    margin-bottom: 2rem;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+    border: 1px solid #e9e9e9;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #fafafa;
+    font-weight: bold;
+}
+
+.admin-card {
+    background: #fff;
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.edit-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+/* ปรับให้ Form Group ยืดหยุ่น */
+.edit-form .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.edit-form label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.edit-form input[type="text"] {
+    margin-bottom: 0;
+    width: 100%;
+}
+
+/* ส่วนจัดการ Toggle Switch และปุ่ม */
+.toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Badge สถานะ */
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-open {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-closed {
+    background: #f8d7da;
+    color: #721c24;
+}
