@@ -37,6 +37,12 @@
 }
 .reservation-list .details {
 	padding-left: 1rem;
+	flex: 1;
+}
+.reservation-list .actions {
+	display: flex;
+	gap: 0.5rem;
+	margin-right: 1rem;
 }
 
 .account-settings {
@@ -58,7 +64,11 @@
 	text-align: center;
 }
 
+button.for-delete {
+	background-color: #dc3545;
+	color: white;
+}
+
 form button {
-    display: block;
     margin: 2rem auto 0;
 }
