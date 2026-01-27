@@ -6,7 +6,7 @@ var db = require("../../db");
 router.get("/", function (req, res, next) {
     // 1. ดึงข้อมูล Zone
     db.execute(
-        'SELECT zone_id, zone_name FROM zone WHERE is_open = 1',
+        'SELECT zone_id, zone_name, zone_details FROM zone WHERE is_open = 1',
         function (err, zones) {
             if (err) return next(err);
 

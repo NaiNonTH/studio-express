@@ -1,0 +1,61 @@
+    /* Zone Grid Layout */
+    .zone-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid */
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    /* The clickable card */
+    .zone-card {
+        position: relative;
+        display: block;
+        cursor: pointer;
+    }
+
+    /* Hide the actual default radio button circle */
+    .zone-card input[type="radio"] {
+        display: none;
+    }
+
+    /* The visual box styling */
+    .zone-box {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 15px;
+        border: 2px solid #e0e0e0; /* Gray border default */
+        border-radius: 8px;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .zone-box h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.1em;
+        color: #333;
+    }
+
+    .zone-box p {
+        margin: 0;
+        font-size: 0.9em;
+        color: #666;
+        line-height: 1.4;
+    }
+
+    /* Hover State */
+    .zone-card:hover .zone-box {
+        border-color: #b0b0b0;
+        background-color: #f9f9f9;
+    }
+
+    /* Selected State (When radio is checked) */
+    .zone-card input[type="radio"]:checked + .zone-box {
+        border-color: #007bff; /* Primary Blue */
+        background-color: #e7f1ff; /* Light Blue BG */
+        box-shadow: 0 4px 6px rgba(0,123,255, 0.2);
+    }
+
+    .zone-card input[type="radio"]:checked + .zone-box h3 {
+        color: #007bff;
+    }
