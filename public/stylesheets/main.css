@@ -20,7 +20,7 @@ body :last-child {
     margin-bottom: 0 !important;
 }
 
-input {
+input, select {
     width: 100%;
     padding: 0.75em 1em;
     margin-bottom: 0.5rem;
@@ -31,11 +31,11 @@ input {
     transition: border-color 0.3s;
 }
 
-input::placeholder {
+input::placeholder, select::placeholder {
     color: #e0e0e0;
 }
 
-input:focus {
+input:focus, select:focus {
     border-color: #999;
 }
 

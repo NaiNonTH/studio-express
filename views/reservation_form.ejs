@@ -1,0 +1,81 @@
+<%- contentFor('body') %>
+<div class="reservation-form">
+    <h1>การจองห้องใหม่</h1>
+    <form method="POST" action="/dashboard/reservation/reservation-process">
+        <div>
+            <label for="customer-name">ชื่อ-สกุล</label>
+            <input type="text" id="customer-name" name="customer_name" readonly value="<%= user.name %>">
+        </div>
+        <div>
+            <label for="reservation-date">วันที่จอง</label>
+            <input type="date" id="reservation-date" name="reservation_date" required>
+            <p class="note">ท่านสามารถจองได้ล่วงหน้าอย่างน้อย 2 วัน</p>
+        </div>
+        <div>
+            <label for="reservation-zone">โซนที่ต้องการจอง</label>
+            <select id="reservation-zone" name="reservation_zone" required class="modern-select">
+                <option value="" disabled selected>-- กรุณาเลือกโซน --</option>
+
+                <% if (typeof zones !== 'undefined' && zones.length > 0) { %>
+                    <% zones.forEach(function(zone) { %>
+                        <option value="<%= zone.zone_id %>">
+                            <%= zone.zone_name %>
+                        </option>
+                    <% }); %>
+                <% } else { %>
+                    <option value="" disabled>ไม่พบข้อมูลโซน</option>
+                <% } %>
+            </select>
+            <p class="note">ระบบจะแสดงเฉพาะโซนที่เปิดให้บริการเท่านั้น</p>
+        </div>
+        <div>
+            <label for="reservation-time">เวลาจอง</label>
+            <select id="reservation-time" name="reservation_time" required>
+                <option value="" disabled selected>-- กรุณาเลือกเวลา --</option>
+                </select>
+            <p class="note">จองได้ครั้งละ 1 ชั่วโมง</p>
+        </div>
+        
+        <button type="submit">ยืนยันการจอง</button>
+    </form>
+</div>
+
+<script>
+    // ส่วนคำนวณวันที่ : วันนี้ + 2 วัน
+    const dateInput = document.getElementById('reservation-date');
+    const today = new Date();
+    
+    // บวกเพิ่ม 2 วัน
+    today.setDate(today.getDate() + 2);
+
+    // จัด Format เป็น YYYY-MM-DD เพื่อใส่ใน value ของ html input
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มที่ 0 เลยต้อง +1
+    const dd = String(today.getDate()).padStart(2, '0');
+    
+    const minDate = `${yyyy}-${mm}-${dd}`;
+
+    // กำหนดค่าต่ำสุดที่เลือกได้ (min)
+    dateInput.min = minDate;
+    
+    // (Option) ถ้าอยากให้เปิดมาแล้วเลือกวันนี้ไว้ให้เลย ก็ uncomment บรรทัดล่างนี้
+    dateInput.value = minDate;
+
+    // --- ส่วนสร้างตัวเลือกเวลา (00:00 - 23:00) ---
+    const timeSelect = document.getElementById('reservation-time');
+
+    for (let i = 0; i < 24; i++) {
+        // แปลงเลข 0-23 ให้เป็น format '00', '01' ...
+        const hour = i.toString().padStart(2, '0');
+        
+        const option = document.createElement('option');
+        
+        // ค่าที่จะส่งเข้า Server (เอาแค่เวลาเริ่ม พอให้ DB เก็บได้ง่ายๆ)
+        option.value = `${hour}:00`; 
+        
+        // ข้อความที่จะโชว์ให้ User เห็น
+        option.textContent = `${hour}:00 - ${hour}:59`;
+        
+        timeSelect.appendChild(option);
+    }
+</script>

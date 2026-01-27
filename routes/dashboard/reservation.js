@@ -4,4 +4,42 @@ var router = express.Router();
 
 var db = require("../../db");
 
+router.get("/", function (req, res) {
+    db.execute(
+        'SELECT zone_id, zone_name, zone_details FROM zone WHERE is_open = 1',
+        function (err, results) {
+            if (err) return next(err);
+            // console.log(results);
+            return res.render("reservation_form", {
+                title: "New Reservation",
+                user: req.session.user,
+                target: req.flash("target")[0] || "",
+                errorMessages: req.flash("errorMessages"),
+                updated: req.flash("updated")[0],
+                zones: results
+            });
+        }
+    );
+});
+
+router.post("/reservation-process", function (req, res, next) {
+    // ใน Route ที่รับค่า POST (reservation-process)
+    const date = req.body.reservation_date; // ได้มาเป็น "2026-01-27"
+    const time = req.body.reservation_time; // ได้มาเป็น "11:00"
+
+    const zone = parseInt(req.body.reservation_zone);
+
+    // รวมร่างกันดื้อๆ เลย (เติม :00 คือวินาที ต่อท้ายให้ครบ format)
+    const timestampForDB = `${date} ${time}:00`;
+    // console.log(req.body);
+    db.execute(
+        'INSERT INTO reservation VALUES (NULL, ?, ?, ?)',
+        [req.session.user.id, zone, timestampForDB],
+        function (err, results) {
+            if (err) return next(err);
+            return res.redirect("/dashboard");
+        }
+    )
+});
+
 module.exports = router;
