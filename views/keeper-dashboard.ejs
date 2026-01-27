@@ -72,23 +72,17 @@
         <div class="admin-card">
             <form action="/dashboard/keeper/edit-zone" method="POST" class="edit-form">
                 <input type="hidden" name="zone_id" value="<%= zone.zone_id %>">
-                
                 <div class="form-group" style="flex: 0.5;">
-                    <label>ชื่อโซน</label>
-                    <input type="text" name="zone_name" value="<%= zone.zone_name %>" required>
+                    <label for=<%= zone.zone_id + "-zone_name"%>>ชื่อโซน</label>
+                    <input type="text" name="zone_name"  id="<%= zone.zone_id + "-zone_name"%>" value="<%= zone.zone_name %>" required>
                 </div>
-
                 <div class="form-group" style="flex: 2;">
-                    <label>รายละเอียด</label>
-                    <input type="text" name="zone_details" value="<%= zone.zone_details %>" required>
+                    <label for=<%= zone.zone_id + "-zone_details"%>>รายละเอียด</label>
+                    <input type="text" name="zone_details"  id="<%= zone.zone_id + "-zone_details"%>" value="<%= zone.zone_details %>" required>
                 </div>
-
                 <div class="form-group" style="flex: 0.5; min-width: auto;">
-                    <label>สถานะ</label>
-                    <label class="toggle-group">
-                        <input type="checkbox" name="is_open" <%= zone.is_open ? 'checked' : '' %>>
-                        เปิดใช้งาน
-                    </label>
+                    <label for=<%= zone.zone_id + "-is_open"%>>เปิดให้จอง?</label>
+                    <input type="checkbox" name="is_open"  id="<%= zone.zone_id + "-is_open"%>" <%= zone.is_open ? 'checked' : '' %>>
                 </div>
 
                 <button type="submit">บันทึก</button>
@@ -99,24 +93,21 @@
 
   <div class="box span admin-section">
     <h3>➕ เพิ่มโซนใหม่</h3>
-    <div class="admin-card" style="background: #fafafa;">
+    <div class="admin-card">
         <form action="/dashboard/keeper/add-zone" method="POST" class="edit-form">
             <div class="form-group" style="flex: 0.5;">
-                <label>ชื่อโซน</label>
-                <input type="text" name="zone_name" placeholder="เช่น Studio A" required>
+                <label for="zone_name">ชื่อโซน</label>
+                <input type="text" name="zone_name" id="zone_name" placeholder="เช่น Studio A" required>
             </div>
 
             <div class="form-group" style="flex: 2;">
-                <label>รายละเอียด</label>
-                <input type="text" name="zone_details" placeholder="รายละเอียดอุปกรณ์ หรือขนาดห้อง" required>
+                <label for="zone_details">รายละเอียด</label>
+                <input type="text" name="zone_details" id="zone_details" placeholder="รายละเอียดอุปกรณ์ หรือขนาดห้อง" required>
             </div>
 
             <div class="form-group" style="flex: 0.5; min-width: auto;">
-                <label>สถานะเริ่มต้น</label>
-                <label class="toggle-group">
-                    <input type="checkbox" name="is_open" checked>
-                    เปิดใช้งาน
-                </label>
+                <label for="is_open">เปิดให้จอง?</label>
+                <input type="checkbox" name="is_open" id="is_open" checked>
             </div>
 
             <button type="submit">เพิ่มโซน</button>
