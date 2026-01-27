@@ -4,20 +4,31 @@ var router = express.Router();
 
 var db = require("../../db");
 
-router.get("/", function (req, res) {
+router.get("/", function (req, res, next) {
+    // 1. ดึงข้อมูล Zone ก่อน
     db.execute(
-        'SELECT zone_id, zone_name, zone_details FROM zone WHERE is_open = 1',
-        function (err, results) {
+        'SELECT zone_id, zone_name FROM zone WHERE is_open = 1',
+        function (err, zones) {
             if (err) return next(err);
-            // console.log(results);
-            return res.render("reservation_form", {
-                title: "New Reservation",
-                user: req.session.user,
-                target: req.flash("target")[0] || "",
-                errorMessages: req.flash("errorMessages"),
-                updated: req.flash("updated")[0],
-                zones: results
-            });
+
+            // 2. ดึงข้อมูล Reservation ทั้งหมดที่มี (เอาแค่ zone_id กับ datetime พอ)
+            db.execute(
+                'SELECT zone_id, datetime FROM reservation',
+                function (err, reservations) {
+                    if (err) return next(err);
+
+                    // 3. ส่งข้อมูลทั้งคู่ไปที่หน้า EJS
+                    return res.render("reservation_form", {
+                        title: "New Reservation",
+                        user: req.session.user,
+                        target: req.flash("target")[0] || "",
+                        errorMessages: req.flash("errorMessages"),
+                        updated: req.flash("updated")[0],
+                        zones: zones,           // ข้อมูลห้อง
+                        reservations: reservations // <--- ข้อมูลการจองที่เพิ่มเข้ามา
+                    });
+                }
+            );
         }
     );
 });

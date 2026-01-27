@@ -41,41 +41,82 @@
 </div>
 
 <script>
-    // ส่วนคำนวณวันที่ : วันนี้ + 2 วัน
+    // 1. รับข้อมูลการจองจาก Server มาเก็บไว้ในตัวแปร JS
+    // JSON.stringify จะแปลงข้อมูล Database เป็น Text เพื่อให้ JS อ่านได้
+    const existingReservations = <%- JSON.stringify(reservations) %>;
+
     const dateInput = document.getElementById('reservation-date');
-    const today = new Date();
-    
-    // บวกเพิ่ม 2 วัน
-    today.setDate(today.getDate() + 2);
-
-    // จัด Format เป็น YYYY-MM-DD เพื่อใส่ใน value ของ html input
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มที่ 0 เลยต้อง +1
-    const dd = String(today.getDate()).padStart(2, '0');
-    
-    const minDate = `${yyyy}-${mm}-${dd}`;
-
-    // กำหนดค่าต่ำสุดที่เลือกได้ (min)
-    dateInput.min = minDate;
-    
-    // (Option) ถ้าอยากให้เปิดมาแล้วเลือกวันนี้ไว้ให้เลย ก็ uncomment บรรทัดล่างนี้
-    dateInput.value = minDate;
-
-    // --- ส่วนสร้างตัวเลือกเวลา (00:00 - 23:00) ---
+    const zoneSelect = document.getElementById('reservation-zone');
     const timeSelect = document.getElementById('reservation-time');
+    
+    // --- ส่วนตั้งค่าวันเริ่มต้น (เหมือนเดิม) ---
+    const today = new Date();
+    today.setDate(today.getDate() + 2);
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const minDate = `${yyyy}-${mm}-${dd}`;
+    
+    dateInput.min = minDate;
+    dateInput.value = minDate; // เลือกวันแรกให้เลย
 
-    for (let i = 0; i < 24; i++) {
-        // แปลงเลข 0-23 ให้เป็น format '00', '01' ...
-        const hour = i.toString().padStart(2, '0');
-        
-        const option = document.createElement('option');
-        
-        // ค่าที่จะส่งเข้า Server (เอาแค่เวลาเริ่ม พอให้ DB เก็บได้ง่ายๆ)
-        option.value = `${hour}:00`; 
-        
-        // ข้อความที่จะโชว์ให้ User เห็น
-        option.textContent = `${hour}:00 - ${hour}:59`;
-        
-        timeSelect.appendChild(option);
+    // --- ฟังก์ชันสร้างตัวเลือกเวลา (Core Logic) ---
+    function updateAvailableTimes() {
+        const selectedDate = dateInput.value; // วันที่ที่ user เลือก (YYYY-MM-DD)
+        const selectedZone = zoneSelect.value; // โซนที่ user เลือก (ID)
+
+        // เคลียร์ Option เวลาเก่าทิ้งก่อน
+        timeSelect.innerHTML = '<option value="" disabled selected>-- กรุณาเลือกเวลา --</option>';
+
+        // วนลูปสร้างเวลา 00:00 - 23:00
+        for (let i = 0; i < 24; i++) {
+            const hour = i.toString().padStart(2, '0');
+            const timeValue = `${hour}:00`; // ค่าที่จะเช็ค เช่น "11:00"
+
+            // สร้าง Element Option เตรียมไว้
+            const option = document.createElement('option');
+            option.value = timeValue;
+            option.textContent = `${hour}:00 - ${hour}:59`;
+
+            // --- เช็คว่าเวลานี้ โดนจองไปหรือยัง? ---
+            // ถ้ายังไม่ได้เลือกโซน หรือ เลือกวัน ก็ให้ปล่อยว่างไปก่อน
+            if (selectedDate && selectedZone) {
+                
+                // ค้นหาใน existingReservations ว่ามีอันไหนชนไหม
+                const isTaken = existingReservations.some(booking => {
+                    // แปลงวันที่จาก DB เป็น Object Date
+                    const bookingDateObj = new Date(booking.datetime);
+                    
+                    // แปลงเป็นวันที่ YYYY-MM-DD (ใช้ en-CA จะได้ format เรียงปีเดือนวันพอดี)
+                    const bookingDateStr = bookingDateObj.toLocaleDateString('en-CA');
+                    
+                    // ดึงเฉพาะเวลา HH:MM ออกมา (ตัด :00 วินาทีทิ้ง)
+                    const bookingTimeStr = bookingDateObj.toTimeString().substring(0, 5);
+
+                    // เงื่อนไข: วันตรง && โซนตรง && เวลาตรง
+                    return bookingDateStr === selectedDate && 
+                           booking.zone_id == selectedZone && 
+                           bookingTimeStr === timeValue;
+                });
+
+                if (isTaken) {
+                    option.disabled = true; // กดไม่ได้
+                    option.textContent += " (ไม่ว่าง)"; // เพิ่มข้อความบอก
+                    option.style.color = "red"; // ตัวแดง
+                }
+            }
+
+            timeSelect.appendChild(option);
+        }
     }
+
+    // --- สั่งให้ทำงานเมื่อมีการเปลี่ยนค่า ---
+    // เมื่อเปลี่ยนวันที่ -> คำนวณเวลาใหม่
+    dateInput.addEventListener('change', updateAvailableTimes);
+    // เมื่อเปลี่ยนโซน -> คำนวณเวลาใหม่
+    zoneSelect.addEventListener('change', updateAvailableTimes);
+
+    // รันครั้งแรกตอนโหลดหน้าเว็บทันที
+    updateAvailableTimes();
+
 </script>
