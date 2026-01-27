@@ -24,19 +24,20 @@
     </a>
 
     <% 
+      // Logic: กรองและเรียงลำดับรายการจอง
       let futureReservations = [];
       
       if (typeof reservations !== 'undefined' && reservations.length > 0) {
         const now = new Date();
         
-        // กรองเอาเฉพาะรายการที่เวลายังไม่ผ่านไป
+        // 1. กรองเอาเฉพาะรายการที่เวลายังไม่ผ่านไป (Check Future)
         futureReservations = reservations.filter(r => {
-          // ใช้ field 'datetime' ที่มาจาก DB โดยตรง
+          // แปลง String จาก DB เป็น Date Object
           const rDate = new Date(r.datetime);
           return rDate >= now; 
         });
         
-        // (Optional) เรียงลำดับจากเวลาใกล้สุดไปไกลสุด
+        // 2. เรียงลำดับจาก เวลาใกล้สุด -> ไกลสุด
         futureReservations.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
       }
     %>
@@ -51,46 +52,65 @@
           <b>เพิ่มการจอง</b>
         เพื่อเริ่มจองได้เลย</p>
       </div>
+
     <% } else { %>
       <% futureReservations.forEach(function(r) { 
            // แปลงข้อมูล datetime เป็น Object เพื่อดึงค่าต่างๆ
            const dateObj = new Date(r.datetime);
            
-           // ดึงชั่วโมงเริ่ม (เช่น 9)
+           // ดึงชั่วโมงและนาที
            const startHour = dateObj.getHours();
-           // ดึงนาทีเริ่ม (เช่น 0)
            const startMinute = dateObj.getMinutes();
            
-           // จัดรูปแบบเวลาเริ่ม (09:00)
+           // จัดรูปแบบเวลาเริ่ม (เช่น 09:00)
            const startTimeStr = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
            
            // คำนวณเวลาจบ (+1 ชั่วโมง)
            const endHour = startHour + 1;
            const endTimeStr = `${endHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
       %>
-        <div class="box">
-          <div class="zone">
-             <%= r.zone_name ? r.zone_name.charAt(0) : 'R' %> 
-          </div>
+        <div class="box" style="display: flex; justify-content: space-between; align-items: center;">
           
-          <div class="details">
-            <div style="font-weight: bold; color: #555; margin-bottom: 4px;">
-                <%= r.zone_name %>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="zone">
+               <%= r.zone_name ? r.zone_name.charAt(0) : 'R' %> 
             </div>
-
-            <h3>
-              <%= dateObj.toLocaleDateString('th-TH', { 
-                  weekday: 'short', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-              }) %>
-            </h3>
             
-            <p>
-                เวลา <%= startTimeStr %> น. - <%= endTimeStr %> น.
-            </p>
+            <div class="details">
+              <div style="font-weight: bold; color: #555; margin-bottom: 4px;">
+                  <%= r.zone_name %>
+              </div>
+  
+              <h3>
+                <%= dateObj.toLocaleDateString('th-TH', { 
+                    weekday: 'short', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }) %>
+              </h3>
+              
+              <p>
+                  เวลา <%= startTimeStr %> น. - <%= endTimeStr %> น.
+              </p>
+            </div>
           </div>
+
+          <div class="actions">
+            <form 
+                method="GET" 
+                action="/dashboard/reservation/cancel-reservation/<%= r.reservation_id %>" 
+                onsubmit="return confirm('⚠️ ยืนยันการยกเลิก?\n\nคุณแน่ใจหรือไม่ว่าต้องการยกเลิกการจองนี้? การกระทำนี้ไม่สามารถย้อนกลับได้');"
+            >
+                <button type="submit" class="button" style="background-color: #dc3545; color: white; padding: 0.5em 1em; font-size: 0.8rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16" style="margin-right: 4px;">
+                      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                    </svg>
+                    ยกเลิก
+                </button>
+            </form>
+          </div>
+
         </div>
       <% }); %>
     <% } %>

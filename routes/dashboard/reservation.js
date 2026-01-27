@@ -33,6 +33,17 @@ router.get("/", function (req, res, next) {
     );
 });
 
+router.get("/cancel-reservation/:id", function (req, res, next) {
+    db.execute(
+        'DELETE FROM reservation WHERE reservation_id = ?;',
+        [req.params.id],
+        function (err, result) {
+            if (err) return next(err);
+            return res.redirect("/dashboard");
+        }
+    )
+})
+
 router.post("/reservation-process", function (req, res, next) {
     const date = req.body.reservation_date; // ได้มาเป็น "2026-01-27"
     const time = req.body.reservation_time; // ได้มาเป็น "11:00"
