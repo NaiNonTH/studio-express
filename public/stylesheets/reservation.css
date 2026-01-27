@@ -1,0 +1,127 @@
+:root {
+    --border-color: #ced4da;
+    --border-radius: 6px;
+    --input-height: 45px;
+    --focus-color: #007bff;
+    --bg-hover: #f8f9fa;
+}
+
+/* Reset Box Sizing */
+* {
+    box_sizing: border-box;
+}
+
+/* Form Styles */
+input[type="text"],
+input[type="date"],
+select {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 16px;
+    color: #495057;
+    background-color: #fff;
+    height: var(--input-height);
+    transition: border-color 0.2s ease-in-out;
+}
+
+input:focus, select:focus {
+    border-color: var(--focus-color);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* --- ZONE GRID SYSTEM --- */
+
+.zone-grid {
+    display: grid;
+    /* บังคับ 3 คอลัมน์เท่ากันเป๊ะ */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px;
+    margin-top: 10px;
+    /* จัดให้ทุกกล่องในแถวสูงเท่ากัน (ยึดตามตัวที่สูงที่สุด) */
+    align-items: stretch; 
+}
+
+@media (max-width: 992px) {
+    .zone-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .zone-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.zone-card {
+    /* ใช้ Flex เพื่อจัดการลูกข้างใน */
+    display: flex; 
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    height: 100%; /* ยืดให้เต็ม Grid cell */
+    margin: 0; /* ล้างค่า Default margin ของ label */
+}
+
+/* --- NUCLEAR FIX: ซ่อน Input แบบถาวร --- */
+.zone-card input[type="radio"] {
+    display: none !important; /* บังคับหายตัว ไม่ให้กินพื้นที่ */
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The Visual Box */
+.zone-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* ดันเนื้อหาไปข้างบน */
+    
+    flex: 1; /* ยืดให้เต็มความสูงของ .zone-card */
+    min-height: 120px;
+    padding: 20px;
+    
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #fff;
+    transition: all 0.2s ease;
+}
+
+/* Text Styling */
+.zone-box h3 {
+    margin: 0 0 10px 0; /* เว้นระยะข้างล่าง */
+    padding: 0; /* ล้าง Padding ติดตัว */
+    font-size: 1.1em;
+    color: #333;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.zone-box p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.5;
+}
+
+/* Hover Effect */
+.zone-card:hover .zone-box {
+    border-color: #adb5bd;
+    background-color: var(--bg-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+}
+
+/* Selected State */
+.zone-card input[type="radio"]:checked + .zone-box {
+    border-color: var(--focus-color);
+    background-color: #e7f1ff;
+    box-shadow: 0 0 0 1px var(--focus-color);
+}
+
+.zone-card input[type="radio"]:checked + .zone-box h3 {
+    color: var(--focus-color);
+}
