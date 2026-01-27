@@ -1,5 +1,5 @@
 <%- contentFor('body') %>
-<div class="reservation-form">
+<div class="reservation-form box">
     <h1><%= (typeof booking !== 'undefined') ? 'แก้ไขการจอง' : 'การจองห้องใหม่' %></h1>
 
     <form method="POST" action="<%= (typeof booking !== 'undefined') ? '/dashboard/reservation/update/' + booking.reservation_id : '/dashboard/reservation/reservation-process' %>">
