@@ -34,7 +34,6 @@ router.get("/", function (req, res, next) {
 });
 
 router.post("/reservation-process", function (req, res, next) {
-    // ใน Route ที่รับค่า POST (reservation-process)
     const date = req.body.reservation_date; // ได้มาเป็น "2026-01-27"
     const time = req.body.reservation_time; // ได้มาเป็น "11:00"
 

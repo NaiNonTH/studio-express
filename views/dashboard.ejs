@@ -3,6 +3,7 @@
 
 <%- contentFor('body') %>
 <div class="dashboard">
+  
   <div class="box span">
     <h2>สวัสดี <%=user.name %></h2>
     <a href="/logout" class="button">
@@ -13,6 +14,7 @@
       ออกจากระบบ
     </a>
   </div>
+
   <div class="box reservation-list">
     <a class="button" href="/dashboard/reservation">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-plus-fill" viewBox="0 0 16 16">
@@ -20,27 +22,80 @@
       </svg>
       เพิ่มการจอง
     </a>
-    <div class="center">
-      <p class="hero">ไม่มีคิวจอง</p>
-      <p>กด
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-plus-fill" viewBox="0 0 16 16">
-          <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M8.5 8.5V10H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V11H6a.5.5 0 0 1 0-1h1.5V8.5a.5.5 0 0 1 1 0"/>
-        </svg>
-        <b>
-          เพิ่มการจอง
-        </b>
-      เพื่อเริ่มจองได้เลย</p>
-    </div>
-    <!-- <div class="box">
-      <div class="zone">
-        A
+
+    <% 
+      let futureReservations = [];
+      
+      if (typeof reservations !== 'undefined' && reservations.length > 0) {
+        const now = new Date();
+        
+        // กรองเอาเฉพาะรายการที่เวลายังไม่ผ่านไป
+        futureReservations = reservations.filter(r => {
+          // ใช้ field 'datetime' ที่มาจาก DB โดยตรง
+          const rDate = new Date(r.datetime);
+          return rDate >= now; 
+        });
+        
+        // (Optional) เรียงลำดับจากเวลาใกล้สุดไปไกลสุด
+        futureReservations.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+      }
+    %>
+
+    <% if (futureReservations.length === 0) { %>
+      <div class="center">
+        <p class="hero">ไม่มีคิวจอง</p>
+        <p>กด
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar-plus-fill" viewBox="0 0 16 16">
+            <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M8.5 8.5V10H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V11H6a.5.5 0 0 1 0-1h1.5V8.5a.5.5 0 0 1 1 0"/>
+          </svg>
+          <b>เพิ่มการจอง</b>
+        เพื่อเริ่มจองได้เลย</p>
       </div>
-      <div class="details">
-        <h3>อา. 18 มกราคม 2569</h3>
-        <p>เวลา 20:00-21:00 น.</p>
-      </div>
-    </div> -->
+    <% } else { %>
+      <% futureReservations.forEach(function(r) { 
+           // แปลงข้อมูล datetime เป็น Object เพื่อดึงค่าต่างๆ
+           const dateObj = new Date(r.datetime);
+           
+           // ดึงชั่วโมงเริ่ม (เช่น 9)
+           const startHour = dateObj.getHours();
+           // ดึงนาทีเริ่ม (เช่น 0)
+           const startMinute = dateObj.getMinutes();
+           
+           // จัดรูปแบบเวลาเริ่ม (09:00)
+           const startTimeStr = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+           
+           // คำนวณเวลาจบ (+1 ชั่วโมง)
+           const endHour = startHour + 1;
+           const endTimeStr = `${endHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+      %>
+        <div class="box">
+          <div class="zone">
+             <%= r.zone_name ? r.zone_name.charAt(0) : 'R' %> 
+          </div>
+          
+          <div class="details">
+            <div style="font-weight: bold; color: #555; margin-bottom: 4px;">
+                <%= r.zone_name %>
+            </div>
+
+            <h3>
+              <%= dateObj.toLocaleDateString('th-TH', { 
+                  weekday: 'short', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+              }) %>
+            </h3>
+            
+            <p>
+                เวลา <%= startTimeStr %> น. - <%= endTimeStr %> น.
+            </p>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
   </div>
+
   <div class="account-settings">
     <form method="post" action="/dashboard/user/edit" class="box">
       <h2>รายละเอียดบัญชี</h2>
@@ -64,6 +119,7 @@
       </div>
       <button>ส่งแก้ไขรายละเอียด</button>
     </form>
+
     <form method="post" action="/dashboard/user/edit-password" class="box">
       <h2>รหัสผ่านใหม่</h2>
       <% if (target === "edit-password") { %>
@@ -91,6 +147,7 @@
       </div>
       <button>ส่งแก้ไขรายละเอียด</button>
     </form>
+
     <form method="post" action="/dashboard/user/delete" class="box">
       <h2>ลบบัญชี</h2>
       <% if (target === "delete") { %>
