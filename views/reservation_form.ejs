@@ -1,24 +1,30 @@
 <%- contentFor('body') %>
 <div class="reservation-form">
-    <h1>การจองห้องใหม่</h1>
-    <form method="POST" action="/dashboard/reservation/reservation-process">
+    <h1><%= (typeof booking !== 'undefined') ? 'แก้ไขการจอง' : 'การจองห้องใหม่' %></h1>
+
+    <form method="POST" action="<%= (typeof booking !== 'undefined') ? '/dashboard/reservation/update/' + booking.reservation_id : '/dashboard/reservation/reservation-process' %>">
+        
         <div>
             <label for="customer-name">ชื่อ-สกุล</label>
             <input type="text" id="customer-name" name="customer_name" readonly value="<%= user.name %>">
         </div>
+
         <div>
             <label for="reservation-date">วันที่จอง</label>
-            <input type="date" id="reservation-date" name="reservation_date" required>
+            <input type="date" id="reservation-date" name="reservation_date" required 
+                   value="<%= (typeof booking !== 'undefined' && booking.datetime) ? booking.datetime.toString().split(' ')[0] : '' %>">
             <p class="note">ท่านสามารถจองได้ล่วงหน้าอย่างน้อย 2 วัน</p>
         </div>
+
         <div>
             <label for="reservation-zone">โซนที่ต้องการจอง</label>
             <select id="reservation-zone" name="reservation_zone" required class="modern-select">
-                <option value="" disabled selected>-- กรุณาเลือกโซน --</option>
+                <option value="" disabled <%= (typeof booking === 'undefined') ? 'selected' : '' %>>-- กรุณาเลือกโซน --</option>
 
                 <% if (typeof zones !== 'undefined' && zones.length > 0) { %>
                     <% zones.forEach(function(zone) { %>
-                        <option value="<%= zone.zone_id %>">
+                        <option value="<%= zone.zone_id %>" 
+                            <%= (typeof booking !== 'undefined' && booking.zone_id === zone.zone_id) ? 'selected' : '' %>>
                             <%= zone.zone_name %>
                         </option>
                     <% }); %>
@@ -28,6 +34,7 @@
             </select>
             <p class="note">ระบบจะแสดงเฉพาะโซนที่เปิดให้บริการเท่านั้น</p>
         </div>
+
         <div>
             <label for="reservation-time">เวลาจอง</label>
             <select id="reservation-time" name="reservation_time" required>
@@ -41,15 +48,17 @@
 </div>
 
 <script>
-    // 1. รับข้อมูลการจองจาก Server มาเก็บไว้ในตัวแปร JS
-    // JSON.stringify จะแปลงข้อมูล Database เป็น Text เพื่อให้ JS อ่านได้
-    const existingReservations = <%- JSON.stringify(reservations) %>;
+    // 1. รับข้อมูลจาก Server
+    // allReservations = รายการจองทั้งหมดของทุกคน (เอาไว้เช็คว่าตรงไหนเต็มแล้ว)
+    // currentBooking = ใบจองปัจจุบันที่เรากำลังแก้ไข (ถ้าเป็นการจองใหม่ค่าจะเป็น null)
+    const allReservations = <%- (typeof reservations !== 'undefined') ? JSON.stringify(reservations) : '[]' %>;
+    const currentBooking = <%- (typeof booking !== 'undefined') ? JSON.stringify(booking) : 'null' %>;
 
     const dateInput = document.getElementById('reservation-date');
-    const zoneSelect = document.getElementById('reservation-zone');
     const timeSelect = document.getElementById('reservation-time');
-    
-    // --- ส่วนตั้งค่าวันเริ่มต้น (เหมือนเดิม) ---
+    const zoneSelect = document.getElementById('reservation-zone');
+
+    // --- ตั้งค่า Min Date (วันนี้ + 2 วัน) ---
     const today = new Date();
     today.setDate(today.getDate() + 2);
     const yyyy = today.getFullYear();
@@ -57,52 +66,79 @@
     const dd = String(today.getDate()).padStart(2, '0');
     const minDate = `${yyyy}-${mm}-${dd}`;
     
+    // ตั้งค่าวันขั้นต่ำที่เลือกได้
     dateInput.min = minDate;
-    dateInput.value = minDate; // เลือกวันแรกให้เลย
+    
+    // ถ้าเป็นการจองใหม่ (Create) และยังไม่ได้เลือกวัน -> ให้เลือกวันแรกสุดอัตโนมัติ
+    if (!currentBooking && !dateInput.value) {
+        dateInput.value = minDate;
+    }
 
     // --- ฟังก์ชันสร้างตัวเลือกเวลา (Core Logic) ---
     function updateAvailableTimes() {
-        const selectedDate = dateInput.value; // วันที่ที่ user เลือก (YYYY-MM-DD)
-        const selectedZone = zoneSelect.value; // โซนที่ user เลือก (ID)
-
-        // เคลียร์ Option เวลาเก่าทิ้งก่อน
+        const selectedDate = dateInput.value; // "2026-01-29"
+        const selectedZone = zoneSelect.value; // "1"
+        
+        // เคลียร์ตัวเลือกเวลาเก่าทิ้ง
         timeSelect.innerHTML = '<option value="" disabled selected>-- กรุณาเลือกเวลา --</option>';
 
         // วนลูปสร้างเวลา 00:00 - 23:00
         for (let i = 0; i < 24; i++) {
             const hour = i.toString().padStart(2, '0');
-            const timeValue = `${hour}:00`; // ค่าที่จะเช็ค เช่น "11:00"
-
-            // สร้าง Element Option เตรียมไว้
+            const timeValue = `${hour}:00`; // เช่น "11:00"
+            
             const option = document.createElement('option');
             option.value = timeValue;
             option.textContent = `${hour}:00 - ${hour}:59`;
 
-            // --- เช็คว่าเวลานี้ โดนจองไปหรือยัง? ---
-            // ถ้ายังไม่ได้เลือกโซน หรือ เลือกวัน ก็ให้ปล่อยว่างไปก่อน
+            // -------------------------------------------------------
+            // จุดสำคัญ: เช็คว่าเวลานี้ "ไม่ว่าง" หรือไม่?
+            // -------------------------------------------------------
+            let isTaken = false;
+            
             if (selectedDate && selectedZone) {
-                
-                // ค้นหาใน existingReservations ว่ามีอันไหนชนไหม
-                const isTaken = existingReservations.some(booking => {
-                    // แปลงวันที่จาก DB เป็น Object Date
-                    const bookingDateObj = new Date(booking.datetime);
-                    
-                    // แปลงเป็นวันที่ YYYY-MM-DD (ใช้ en-CA จะได้ format เรียงปีเดือนวันพอดี)
-                    const bookingDateStr = bookingDateObj.toLocaleDateString('en-CA');
-                    
-                    // ดึงเฉพาะเวลา HH:MM ออกมา (ตัด :00 วินาทีทิ้ง)
-                    const bookingTimeStr = bookingDateObj.toTimeString().substring(0, 5);
+                // เช็คเทียบกับรายการจองทั้งหมดใน DB
+                isTaken = allReservations.some(r => {
+                    // กฎข้อที่ 1: ถ้าเป็น "ใบจองของตัวเอง" ที่กำลังแก้อยู่ ให้ถือว่า "ไม่ชน" (ข้ามไปเลย)
+                    if (currentBooking && r.reservation_id == currentBooking.reservation_id) {
+                        return false; 
+                    }
 
-                    // เงื่อนไข: วันตรง && โซนตรง && เวลาตรง
-                    return bookingDateStr === selectedDate && 
-                           booking.zone_id == selectedZone && 
-                           bookingTimeStr === timeValue;
+                    // กฎข้อที่ 2: เช็คการชนกับคนอื่น (วันตรง && โซนตรง && เวลาตรง)
+                    
+                    // แปลง format เวลาจาก DB ให้เป็น "YYYY-MM-DD HH:MM"
+                    // รองรับทั้งแบบมี T และไม่มี T (กันเหนียว)
+                    const rDateTime = r.datetime.toString().replace('T', ' ').substring(0, 16); 
+                    const checkDateTime = `${selectedDate} ${timeValue}`;
+                    
+                    // ถ้าโซนตรง และ เวลาตรงกันเป๊ะ -> แสดงว่าชน!
+                    return r.zone_id == selectedZone && rDateTime === checkDateTime;
                 });
+            }
 
-                if (isTaken) {
-                    option.disabled = true; // กดไม่ได้
-                    option.textContent += " (ไม่ว่าง)"; // เพิ่มข้อความบอก
-                    option.style.color = "red"; // ตัวแดง
+            // ถ้าโดนจองแล้ว (isTaken = true)
+            if (isTaken) {
+                option.disabled = true;           // ห้ามกด
+                option.textContent += " (ไม่ว่าง)"; // บอก user ว่าเต็ม
+                option.style.color = "red";       // ทำตัวแดง
+            }
+
+            // -------------------------------------------------------
+            // ส่วน Pre-select (กรณี Edit)
+            // -------------------------------------------------------
+            if (currentBooking) {
+                // ดึงเวลาเดิมของตัวเองออกมา เช่น "2026-01-29 11:00:00" -> ตัดเอา "11:00"
+                const oldTime = currentBooking.datetime.toString().split(' ')[1].substring(0, 5);
+                const oldDate = currentBooking.datetime.toString().split(' ')[0];
+
+                // ถ้าเวลานี้ คือเวลาเดิมของเรา และ วันที่เลือกคือวันเดิม
+                if (timeValue === oldTime && selectedDate === oldDate) {
+                    option.selected = true; // เลือกให้อัตโนมัติ
+                    
+                    // สำคัญ: ต้องเปิดให้เลือกได้ (Override ค่า isTaken เมื่อกี้)
+                    option.disabled = false;
+                    option.textContent = option.textContent.replace(' (ไม่ว่าง)', ''); // ลบคำว่าไม่ว่างออก
+                    option.style.color = ''; // ลบสีแดงออก
                 }
             }
 
@@ -110,13 +146,10 @@
         }
     }
 
-    // --- สั่งให้ทำงานเมื่อมีการเปลี่ยนค่า ---
-    // เมื่อเปลี่ยนวันที่ -> คำนวณเวลาใหม่
+    // สั่งให้ทำงานเมื่อมีการเปลี่ยนค่า วันที่ หรือ โซน
     dateInput.addEventListener('change', updateAvailableTimes);
-    // เมื่อเปลี่ยนโซน -> คำนวณเวลาใหม่
     zoneSelect.addEventListener('change', updateAvailableTimes);
 
-    // รันครั้งแรกตอนโหลดหน้าเว็บทันที
+    // รันครั้งแรกทันทีตอนโหลดหน้าเว็บ (เพื่อให้เวลาของหน้า Edit โผล่มาเลย)
     updateAvailableTimes();
-
 </script>
