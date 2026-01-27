@@ -121,17 +121,29 @@ router.post("/delete", function(req, res, next) {
       req.flash("errorMessages", "รหัสผ่านปัจจุบันไม่ถูกต้อง");
     }
 
-    if (errorFlag)
-      return res.redirect("/dashboard");
+    db.query(
+      "SELECT COUNT(*) AS reservation_count FROM reservation WHERE user_id = ? AND datetime >= ?",
+      [req.session.user.id, Date.now()],
+      (err, r) => {
+        if (err) return next(err);
 
-    db.execute("DELETE FROM user WHERE user_id = ?", [req.session.user.id], (err, results) => {
-      if (err) return next(err);
+        console.log(r[0].reservation_count, typeof r[0].reservation_count);
 
-      if (errorFlag)
-        return res.redirect("/dashboard");
+        if (r[0].reservation_count > 0) {
+          errorFlag = true;
+          req.flash("errorMessages", "กรุณายกเลิกการจองก่อนปิดบัญชี");
+        }
 
-      return res.redirect("/logout");
-    });
+        if (errorFlag)
+          return res.redirect("/dashboard");
+      
+        db.execute("DELETE FROM user WHERE user_id = ?", [req.session.user.id], (err) => {
+          if (err) return next(err);
+        
+          return res.redirect("/logout");
+        });
+      }
+    );
   });
 });
 
