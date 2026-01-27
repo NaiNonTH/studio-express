@@ -127,8 +127,6 @@ router.post("/delete", function(req, res, next) {
       (err, r) => {
         if (err) return next(err);
 
-        console.log(r[0].reservation_count, typeof r[0].reservation_count);
-
         if (r[0].reservation_count > 0) {
           errorFlag = true;
           req.flash("errorMessages", "กรุณายกเลิกการจองก่อนปิดบัญชี");
