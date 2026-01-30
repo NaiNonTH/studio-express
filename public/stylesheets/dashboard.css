@@ -39,6 +39,13 @@
 	padding-left: 1rem;
 	flex: 1;
 }
+.reservation-list .details h3 {
+	margin: 0.5rem 0;
+}
+.reservation-list .details .note {
+	text-align: left;
+	margin: 0;
+}
 .reservation-list .actions {
 	display: flex;
 	gap: 0.5rem;
