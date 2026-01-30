@@ -58,7 +58,8 @@
           <h3>
             <%= dateObj.toLocaleDateString('th-TH', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' }) %>
           </h3>
-          <p>เวลา <%= startTimeStr %> น. - <%= endTimeStr %> น.</p>
+          <p class="note"><%= r.zone_name %></p>
+          <p class="note">เวลา <%= startTimeStr %> น. - <%= endTimeStr %> น.</p>
         </div>
         <div class="actions">
           <a href="/dashboard/reservation/edit/<%= r.reservation_id %>" class="button">
