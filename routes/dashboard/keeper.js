@@ -50,6 +50,9 @@ router.get("/", function(req, res, next) {
           user: req.session.user,
           stats: statsResults,
           bookings: todayResults,
+          target: req.flash("target")[0] || "",
+          errorMessages: req.flash("errorMessages"),
+          updated: req.flash("updated")[0],
           zones: zones
         });
       });

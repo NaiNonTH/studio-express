@@ -114,4 +114,32 @@
         </form>
     </div>
   </div>
+
+  <form method="post" action="/dashboard/user/edit-password" class="box">
+    <h2>รหัสผ่านใหม่</h2>
+    <% if (target === "edit-password") { %>
+      <ul class="error">
+        <% for (const errorMessage of errorMessages) { %>
+          <li><%=errorMessage %></li>
+        <% } %>
+      </ul>
+      <% if (updated) { %>
+       <p>อัพเดทรหัสผ่านสำเร็จ</p>
+      <% } %>
+    <% } %>
+    <div>
+      <label for="current_password">รหัสผ่านปัจจุบัน</label>
+      <input type="password" name="current_password" id="current_password">
+    </div>
+    <div>
+      <label for="new_password">รหัสผ่านใหม่</label>
+      <input type="password" name="new_password" id="new_password">
+      <p class="note">รหัสผ่านต้องยาวตั้งแต่ 8 ตัวอักษรขึ้นไป</p>
+    </div>
+    <div>
+      <label for="confirm_password">กรอกรหัสผ่านใหม่อีกครั้ง</label>
+      <input type="password" name="confirm_password" id="confirm_password">
+    </div>
+    <button>ส่งแก้ไขรายละเอียด</button>
+  </form>
 </div>
