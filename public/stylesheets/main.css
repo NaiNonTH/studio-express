@@ -114,3 +114,34 @@ form .note {
     text-align: right;
     margin: 0;
 }
+
+input[type="checkbox"] {
+    appearance: none;
+    border: 1px solid #bfbfbf;
+
+    position: relative;
+    width: 2.5em;
+    height: 1em;
+    background: #dfdfdf;
+    border-radius: 1em;
+
+    transition: background-color 0.2s, border-color 0.2s;
+}
+input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    inset: 0.15em;
+    background: white;
+    box-shadow: 0 1px 4px #0003;
+    border-radius: 1em;
+    width: 1rem;
+    
+    transition: transform 0.2s;
+}
+input[type="checkbox"]:checked {
+    background: #000;
+    border-color: #000;
+}
+input[type="checkbox"]:checked:before {
+    transform: translate(1em);
+}

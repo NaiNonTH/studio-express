@@ -19,10 +19,6 @@
 
 /* --- ส่วนเดิมของ Admin (ปรับปรุงเล็กน้อย) --- */
 
-.admin-section {
-    margin-bottom: 2rem;
-}
-
 .admin-table {
     width: 100%;
     border-collapse: collapse;
@@ -43,7 +39,7 @@
 }
 
 .admin-card {
-    background: #fff;
+    background: #fafafa;
     padding: 1rem;
     border: 1px solid #eee;
     border-radius: 8px;
@@ -53,7 +49,7 @@
 .edit-form {
     display: flex;
     gap: 1rem;
-    align-items: flex-end;
+    align-items: center;
     flex-wrap: wrap;
 }
 
@@ -61,6 +57,7 @@
 .edit-form .form-group {
     flex: 1;
     min-width: 200px;
+    margin: 0;
 }
 
 .edit-form label {
